@@ -1,15 +1,18 @@
-# Reproducible Research: Peer Assessment 1, by Tony
+---
+title: "Reproducible Research: Peer Assessment 1, by Tony"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data
-
-```r
+```{r}
 activity_data<-read.csv("activity.csv")
 ```
 
 ## What is mean total number of steps taken per day?
-
-```r
+```{r}
 mean_step_by_day<-aggregate(steps~date,data=activity_data,mean)
 median_step_by_day<-aggregate(steps~date,data=activity_data,median)
 sum_step_by_day<-aggregate(steps~date,data=activity_data,sum)
@@ -18,53 +21,29 @@ hist(sum_step_by_day[,2],
      xlab="total steps by day",breaks=20)
 ```
 
-![plot of chunk unnamed-chunk-2](PA1_template_files/figure-html/unnamed-chunk-2.png) 
-
 Below are the mean and median steps per day.
-
-```r
+```{r}
 mean(sum_step_by_day[,2])
-```
-
-```
-## [1] 10766
-```
-
-```r
 median(sum_step_by_day[,2])
 ```
 
-```
-## [1] 10765
-```
-
 ## What is the average daily activity pattern?
-
-```r
+```{r}
 # Subset by intervals by 5
 mean_step_by_day_5<-aggregate(steps~date,
       data=activity_data[activity_data$interval==5,],
       function(x) mean(x,na.rm=TRUE))
 ```
 Plot time series
-
-```r
+```{r}
 plot(as.Date(mean_step_by_day_5$date),mean_step_by_day_5$steps,type="l",
      xlab="Date",ylab="steps")
 ```
 
-![plot of chunk unnamed-chunk-5](PA1_template_files/figure-html/unnamed-chunk-5.png) 
-
 The date with maximum steps on interval 5 is:
-
-```r
+```{r}
 mean_step_by_day_5[mean_step_by_day_5$step==
     max(mean_step_by_day_5$step),]
-```
-
-```
-##         date steps
-## 8 2012-10-10    18
 ```
 
 
@@ -73,18 +52,12 @@ mean_step_by_day_5[mean_step_by_day_5$step==
 ## Imputing missing values
 
 The number of NA values are:
-
-```r
+```{r}
 sum(is.na(activity_data$steps))
 ```
 
-```
-## [1] 2304
-```
-
 We will put the means of the all the steps in the NAs
-
-```r
+```{r}
 mean_of_all_steps <- mean(activity_data$steps,na.rm=TRUE)
 NA_filled_activity_data <- activity_data
 NA_filled_activity_data$steps[is.na(NA_filled_activity_data$steps)] <-
@@ -98,32 +71,19 @@ sum_step_by_day2<-aggregate(steps~date,data=NA_filled_activity_data,sum)
 hist(sum_step_by_day2[,2],
      main="Histogram of Mean steps by day",
      xlab="total steps by day",breaks=20)
-```
 
-![plot of chunk unnamed-chunk-8](PA1_template_files/figure-html/unnamed-chunk-8.png) 
+```
 Below are the mean and median steps per day with NAs changed to means.
-
-```r
+```{r}
 mean(sum_step_by_day2[,2])
-```
-
-```
-## [1] 10766
-```
-
-```r
 median(sum_step_by_day2[,2])
-```
-
-```
-## [1] 10766
 ```
 As one can see, changing the NAs to the mean of the steps per day had no change to the mean and little change to the median
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
 
-```r
 # Subset by intervals by 5
 NA_mean_step_by_day_5<-aggregate(steps~date,
       data=NA_filled_activity_data[NA_filled_activity_data$interval==5,],mean)
@@ -140,8 +100,7 @@ NA_mean_step_by_day_5$day_of_week[
     NA_mean_step_by_day_5$day_of_week != "Weekend"]<-
   "Weekday"
 ```
-
-```r
+```{r}
 #Make it into a factor
 NA_mean_step_by_day_5$day_of_week<-as.factor(NA_mean_step_by_day_5$day_of_week)
 
@@ -152,8 +111,7 @@ library(plyr)
 NA_mean_step_by_day_5 <- mutate(NA_mean_step_by_day_5, date = as.Date(NA_mean_step_by_day_5$date))
 ggplot(data = NA_mean_step_by_day_5, aes(date, steps)) + 
     geom_line() +facet_grid(day_of_week~.)
-```
 
-![plot of chunk unnamed-chunk-11](PA1_template_files/figure-html/unnamed-chunk-11.png) 
+```
 
 
